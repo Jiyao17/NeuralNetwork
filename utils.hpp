@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrix.hpp"
+#include<ctime>
 
 
 template<typename T>
@@ -27,14 +28,6 @@ public:
 };
 
 template<typename T>
-typename LRTS<T>::scalar LRTS<T>::randFrac()
-{
-	scalar r = rand() % 1000000 / 1000000.0 * _noiseScope;
-	int sign = rand() % 2 ? -1 : 1;
-	return sign * r;
-};
-
-template<typename T>
 LRTS<T>::LRTS(const Matrix<T> &w, T wScope, T b, T noiseScope, size_t batchSize)
 {
 	_w = &w;
@@ -43,7 +36,17 @@ LRTS<T>::LRTS(const Matrix<T> &w, T wScope, T b, T noiseScope, size_t batchSize)
 	_noiseScope = noiseScope;
 	_wScope = wScope;
 	_batchSize = batchSize;
+
+	srand((unsigned)time(NULL));
 }
+
+template<typename T>
+typename LRTS<T>::scalar LRTS<T>::randFrac()
+{
+	scalar r = rand() % 1000000 / 1000000.0 * _noiseScope;
+	int sign = rand() % 2 ? -1 : 1;
+	return sign * r;
+};
 
 template<typename T>
 Matrix<T>* LRTS<T>::randx()
