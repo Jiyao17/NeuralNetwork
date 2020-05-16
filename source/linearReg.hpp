@@ -21,7 +21,6 @@ public:
 template<typename T>
 void LinearReg<T>::grad(const Matrix<T>& x, const Matrix<T>& tag)
 {
-	Matrix<T>* tempGradW;
 	//LinearNet<T>* ln = static_cast<LinearNet<T>*>(this);
 
 	this->linearEval(x);
@@ -30,13 +29,13 @@ void LinearReg<T>::grad(const Matrix<T>& x, const Matrix<T>& tag)
 	//std::cout << tag;
 	this->_y -= tag;
 
-	tempGradW = x * this->_y._mat[0][0];
-	tempGradW->reshape(this->_w._rowNum, 1);
+	this->_tempGradW = x * this->_y._mat[0][0];
+	this->_tempGradW->reshape(this->_w._rowNum, 1);
 
 	//std::cout << *tempGradW;
 	//std::cout << this->_y;
 
-	this->_gradW += *tempGradW;
+	this->_gradW += this->tempGradW;
 	this->_gradB += this->_y._mat[0][0];
 }
 

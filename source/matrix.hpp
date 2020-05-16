@@ -58,6 +58,7 @@ public:
 	Matrix& operator+=(const scalar &s);
 	Matrix& operator-=(const Matrix &M);
 	Matrix& operator-=(const scalar &s);
+	Matrix& operator/=(const scalar &s);
 
 	// currently only row vec -> col vec or vice versa supported
 	// no propagation
@@ -66,8 +67,10 @@ public:
 	// recast the matrix itself
 	Matrix& reshape(size_t rowNum, size_t colNum);
 
-	void clear();
+	void resize(size_t rowNum, size_t colNum);
 	//friend std::ostream& operator<<(std::ostream &os, const Matrix &M);
+
+	size_t maxElemIndex(int dim=0, size_t num=0);
 };
 
 template<typename T>
@@ -456,7 +459,18 @@ Matrix<T>& Matrix<T>::operator-=(const scalar &s)
 	if (VERBOSITY)
 		std::cout << "M.operator-=(s) scalar called." << std::endl;
 
-	*this += (-1)*s;
+	*this += scalar(-1)*s;
+
+	return *this;
+}
+
+template<typename T>
+Matrix<T>& Matrix<T>::operator/=(const scalar &s)
+{
+	if (VERBOSITY)
+		std::cout << "M.operator/=s called." << std::endl;
+
+	*this *= scalar(1) / s;
 
 	return *this;
 }
@@ -505,9 +519,58 @@ Matrix<T>& Matrix<T>::reshape(size_t rowNum, size_t colNum)
 }
 
 template<typename T>
-void Matrix<T>::clear()
+void Matrix<T>::resize(size_t rowNum, size_t colNum)
 {
+	for (size_t i = 0; i < _rowNum; i++)
+		delete[] _mat[i];
+	delete[] _mat;
 
+	_rowNum = rowNum;
+	_colNum = colNum;
+	_mat = new vector[_rowNum];
+
+	for (size_t i = 0; i < _rowNum; i++)
+		_mat[i] = new scalar[_colNum];
+}
+
+template<typename T>
+size_t Matrix<T>::maxElemIndex(int dim, size_t num)
+{
+	size_t index = 0;
+	scalar maxElem;
+
+	if (dim)
+	{
+		//if (num >= _rowNum)
+		//	throw;
+
+		maxElem = _mat[0][num];
+		for (size_t i = 0; i < _rowNum; i++)
+		{
+			if (_mat[i][num] > maxElem)
+			{
+				index = i;
+				maxElem = _mat[i][num];
+			}
+		}
+	}
+	else
+	{
+		//if (num >= _colNum)
+		//	throw;
+
+		maxElem = _mat[num][0];
+		for (size_t i = 0; i < _colNum; i++)
+		{
+			if (_mat[num][i] > maxElem)
+			{
+				index = i;
+				maxElem = _mat[num][i];
+			}
+		}
+	}
+	
+	return index;
 }
 
 template<typename T>
